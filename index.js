@@ -56,7 +56,7 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-cron.schedule("* 0 0 * * *", () => {
+cron.schedule("0 0 0 * * *", () => {
   axios
     .get("https://meme-api.herokuapp.com/gimme")
     .then((response) => {
