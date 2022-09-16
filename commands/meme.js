@@ -5,16 +5,14 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("meme")
     .setDescription("Replies with a meme!"),
-  async execute(interaction) {
+  async execute({ client, interaction }) {
     axios
-    .get("https://meme-api.herokuapp.com/gimme")
-    .then((response) => {
-
+      .get("https://meme-api.herokuapp.com/gimme")
+      .then((response) => {
         interaction.reply(response.data.url);
-      
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
 };

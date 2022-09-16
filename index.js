@@ -5,12 +5,25 @@ const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const dotenv = require("dotenv");
 dotenv.config();
 const axios = require("axios");
+const { Player } = require("discord-player");
+
 // Create a new client instance
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildVoiceStates,
+  ],
 });
 
 client.commands = new Collection();
+client.player = new Player(client, {
+  ytdlOptions: {
+    quality: "highestaudio",
+    highWaterMark: 1 << 25,
+  },
+});
+
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
   .readdirSync(commandsPath)
@@ -24,20 +37,20 @@ for (const file of commandFiles) {
   client.commands.set(command.data.name, command);
 }
 
-// When the client is ready, run this code (only once)
-client.once("ready", () => {
-  console.log("Ready!");
-  axios
-    .get("https://meme-api.herokuapp.com/gimme")
-    .then((response) => {
-      client.channels.cache
-        .get(process.env.memechannel)
-        .send(response.data.url);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-});
+const eventsPath = path.join(__dirname, "events");
+const eventFiles = fs
+  .readdirSync(eventsPath)
+  .filter((file) => file.endsWith(".js"));
+
+for (const file of eventFiles) {
+  const filePath = path.join(eventsPath, file);
+  const event = require(filePath);
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
+  }
+}
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
@@ -46,7 +59,7 @@ client.on("interactionCreate", async (interaction) => {
   if (!command) return;
 
   try {
-    await command.execute(interaction);
+    await command.execute({ client, interaction });
   } catch (error) {
     console.error(error);
     await interaction.reply({
