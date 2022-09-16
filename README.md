@@ -16,4 +16,6 @@ To run the bot create an .env file with the parameters:
 - `memechannel` (ID of the channel you want the memes to be sent to)
 
 
+Random change by G
+
 Finally do `node index.js` which will start your bot.
