@@ -2,6 +2,8 @@
 
 This is a bot which takes memes from reddit via an API and posts the meme in a desired channel. It posts a meme every 24 hours. This can be changed on te cron.schedule setting.
 
+**Update** 16/09/2022 - The memster has Music functionality.
+
 ## How to run the bot
 
 Install all the node modules by `npm install` in the files directory
